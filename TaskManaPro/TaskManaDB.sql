@@ -30,8 +30,9 @@ GO
 
 CREATE TABLE Lists (
     ListId INT PRIMARY KEY IDENTITY(1,1),
-    ListName NVARCHAR(100) NOT NULL,
+    ListTitle NVARCHAR(100) NOT NULL,
     BoardId INT NOT NULL,
+    CreatedAt DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (BoardId) REFERENCES Boards(BoardId)
 );
 GO

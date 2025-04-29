@@ -51,7 +51,6 @@ namespace TaskManaPro.Forms
         private void LoadBoards()
         {
             sidePanel.Controls.Clear();
-            sidePanel.Controls.Add(btnCreateBoard);
 
             using (SqlConnection conn = DatabaseHelper.GetConnection())
             {
@@ -71,10 +70,14 @@ namespace TaskManaPro.Forms
                         Tag = (int)reader["BoardId"]
                     };
                     btn.Click += Btn_Click;
+                    btn.Margin = new Padding(5);
                     sidePanel.Controls.Add(btn);
                 }
             }
+
+            sidePanel.Controls.Add(btnCreateBoard); // 👈 Add this LAST
         }
+
 
         // Handle board button click, load the corresponding board
         private void Btn_Click(object sender, EventArgs e)

@@ -35,11 +35,11 @@ namespace TaskManaPro.UserControls
                         string listTitle = reader["ListTitle"].ToString();
 
                         ListControl listControl = new ListControl(listId);
-                        listControl.Title = listTitle; // Set the title for the list
-                        flpLists.Controls.Add(listControl); // Add the list control to the FlowLayoutPanel
+                        listControl.Title = listTitle;
+                        flpLists.Controls.Add(listControl);
                     }
 
-                    reader.Close(); // Close the reader explicitly
+                    reader.Close();
                 }
             }
             catch (Exception ex)
@@ -47,9 +47,7 @@ namespace TaskManaPro.UserControls
                 MessageBox.Show($"Error loading lists: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            // Optional: Add control to create a new list at the bottom of the panel
-            AddAddListControl();
-            NotificationHelper.Show("List added to board.");
+            AddAddListControl(); // Add the "+ Add another list" control
         }
 
         private void AddAddListControl()
@@ -60,8 +58,7 @@ namespace TaskManaPro.UserControls
 
         public void ReloadLists()
         {
-            LoadLists(); // Calls your existing LoadLists() method
+            LoadLists(); // Just reuse the same list loading logic
         }
-
     }
 }

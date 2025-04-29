@@ -20,27 +20,27 @@
             this.SuspendLayout();
 
             // 
-            // btnShowInput ("+ Add another list")
+            // btnShowInput
             // 
-            this.btnShowInput.Dock = DockStyle.Fill;
-            this.btnShowInput.FlatStyle = FlatStyle.Flat;
+            this.btnShowInput.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.btnShowInput.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnShowInput.FlatAppearance.BorderSize = 1;
             this.btnShowInput.FlatAppearance.BorderColor = System.Drawing.Color.LightGray;
             this.btnShowInput.BackColor = System.Drawing.Color.FromArgb(245, 245, 245);
             this.btnShowInput.ForeColor = System.Drawing.Color.DimGray;
             this.btnShowInput.Font = new System.Drawing.Font("Segoe UI", 9F);
             this.btnShowInput.Text = "+ Add another list";
-            this.btnShowInput.Margin = new Padding(5);
-            this.btnShowInput.Padding = new Padding(5);
+            this.btnShowInput.Margin = new System.Windows.Forms.Padding(5);
+            this.btnShowInput.Padding = new System.Windows.Forms.Padding(5);
             this.btnShowInput.Click += new System.EventHandler(this.btnShowInput_Click);
 
             // 
-            // panelInput (shown when button is clicked)
+            // panelInput
             // 
             this.panelInput.Controls.Add(this.txtListTitle);
             this.panelInput.Controls.Add(this.btnAddList);
             this.panelInput.Controls.Add(this.btnCancel);
-            this.panelInput.Dock = DockStyle.Fill;
+            this.panelInput.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelInput.BackColor = System.Drawing.Color.WhiteSmoke;
             this.panelInput.Visible = false;
 
@@ -61,19 +61,19 @@
             this.btnAddList.Size = new System.Drawing.Size(75, 25);
             this.btnAddList.BackColor = System.Drawing.Color.DodgerBlue;
             this.btnAddList.ForeColor = System.Drawing.Color.White;
-            this.btnAddList.FlatStyle = FlatStyle.Flat;
+            this.btnAddList.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnAddList.FlatAppearance.BorderSize = 0;
             this.btnAddList.Click += new System.EventHandler(this.btnAddList_Click);
 
             // 
-            // btnCancel ("X")
+            // btnCancel
             // 
             this.btnCancel.Text = "X";
             this.btnCancel.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold);
             this.btnCancel.Location = new System.Drawing.Point(85, 35);
             this.btnCancel.Size = new System.Drawing.Size(25, 25);
             this.btnCancel.BackColor = System.Drawing.Color.Transparent;
-            this.btnCancel.FlatStyle = FlatStyle.Flat;
+            this.btnCancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnCancel.FlatAppearance.BorderSize = 0;
             this.btnCancel.Click += new System.EventHandler(this.btnCancel_Click);
 
@@ -82,9 +82,9 @@
             // 
             this.BackColor = System.Drawing.Color.Transparent;
             this.Size = new System.Drawing.Size(180, 80);
-            this.Controls.Add(this.btnShowInput);
             this.Controls.Add(this.panelInput);
-            this.Margin = new Padding(10);
+            this.Controls.Add(this.btnShowInput);
+            this.Margin = new System.Windows.Forms.Padding(10);
 
             this.panelInput.ResumeLayout(false);
             this.panelInput.PerformLayout();

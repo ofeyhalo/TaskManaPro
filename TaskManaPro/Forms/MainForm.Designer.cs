@@ -3,7 +3,7 @@
     partial class MainForm
     {
         private System.Windows.Forms.Panel topPanel;
-        private System.Windows.Forms.Panel sidePanel;
+        private System.Windows.Forms.FlowLayoutPanel sidePanel;
         private System.Windows.Forms.Panel mainContentPanel;
         private System.Windows.Forms.Label lblTitle;
         private System.Windows.Forms.Button btnMinimize;
@@ -16,7 +16,7 @@
             lblTitle = new Label();
             btnMinimize = new Button();
             btnClose = new Button();
-            sidePanel = new Panel();
+            sidePanel = new FlowLayoutPanel();
             btnCreateBoard = new Button();
             mainContentPanel = new Panel();
             topPanel.SuspendLayout();
@@ -77,13 +77,16 @@
             // sidePanel
             // 
             sidePanel.BackColor = Color.White;
-            sidePanel.Controls.Add(btnCreateBoard);
             sidePanel.Dock = DockStyle.Left;
             sidePanel.Location = new Point(0, 40);
             sidePanel.Name = "sidePanel";
             sidePanel.Padding = new Padding(10);
             sidePanel.Size = new Size(250, 660);
             sidePanel.TabIndex = 1;
+            sidePanel.FlowDirection = FlowDirection.TopDown;
+            sidePanel.WrapContents = false;
+            sidePanel.AutoScroll = true;
+
             // 
             // btnCreateBoard
             // 

@@ -1,7 +1,6 @@
 ﻿using System;
-using Microsoft.Data.SqlClient;
-using System.Drawing;
 using System.Windows.Forms;
+using Microsoft.Data.SqlClient;
 using TaskManaPro.Helpers;
 
 namespace TaskManaPro.UserControls
@@ -12,8 +11,8 @@ namespace TaskManaPro.UserControls
 
         public AddListControl(int boardId)
         {
-            InitializeComponent();
             this.boardId = boardId;
+            InitializeComponent();
         }
 
         private void btnShowInput_Click(object sender, EventArgs e)
@@ -39,41 +38,48 @@ namespace TaskManaPro.UserControls
                 return;
             }
 
-
-            using (SqlConnection conn = DatabaseHelper.GetConnection())
+            try
             {
-                conn.Open();
+                using (SqlConnection conn = DatabaseHelper.GetConnection())
+                {
+                    conn.Open();
 
-                // Get the current max SortOrder for the board
-                SqlCommand getMaxOrderCmd = new SqlCommand(
-                    "SELECT ISNULL(MAX(SortOrder), 0) FROM Lists WHERE BoardId = @BoardId",
-                    conn
-                );
-                getMaxOrderCmd.Parameters.AddWithValue("@BoardId", boardId);
+                    var getMaxOrderCmd = new SqlCommand(
+                        "SELECT ISNULL(MAX(SortOrder), 0) FROM Lists WHERE BoardId = @BoardId",
+                        conn
+                    );
+                    getMaxOrderCmd.Parameters.AddWithValue("@BoardId", boardId);
+                    int maxSortOrder = (int)getMaxOrderCmd.ExecuteScalar();
 
-                int maxSortOrder = (int)getMaxOrderCmd.ExecuteScalar();
+                    var insertCmd = new SqlCommand(
+                        "INSERT INTO Lists (BoardId, listTitle, SortOrder) VALUES (@BoardId, @listTitle, @SortOrder)",
+                        conn
+                    );
+                    insertCmd.Parameters.AddWithValue("@BoardId", boardId);
+                    insertCmd.Parameters.AddWithValue("@listTitle", listTitle);
+                    insertCmd.Parameters.AddWithValue("@SortOrder", maxSortOrder + 1);
 
-                // Insert new list with SortOrder = max + 1
-                SqlCommand insertCmd = new SqlCommand(
-                    "INSERT INTO Lists (BoardId, listTitle, CreatedAt, SortOrder) VALUES (@BoardId, @listTitle, GETDATE(), @SortOrder)",
-                    conn
-                );
-                insertCmd.Parameters.AddWithValue("@BoardId", boardId);
-                insertCmd.Parameters.AddWithValue("@listTitle", listTitle);
-                insertCmd.Parameters.AddWithValue("@SortOrder", maxSortOrder + 1);
+                    insertCmd.ExecuteNonQuery();
+                }
 
-                insertCmd.ExecuteNonQuery();
+                txtListTitle.Clear();
+                panelInput.Visible = false;
+                btnShowInput.Visible = true;
+
+                // Reload lists from BoardControl
+                if (this.Parent is FlowLayoutPanel flowPanel && flowPanel.Parent is BoardControl boardControl)
+                {
+                    boardControl.ReloadLists();
+                }
+                else
+                {
+                    MessageBox.Show("Error: Unable to locate BoardControl to refresh lists.", "UI Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
             }
-
-
-            txtListTitle.Clear();
-            panelInput.Visible = false;
-            btnShowInput.Visible = true;
-
-            // Reload lists from parent (BoardControl)
-            BoardControl parent = this.Parent as BoardControl;
-            parent?.ReloadLists(); // You must add a public ReloadLists() method to BoardControl
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error adding list: " + ex.Message, "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
-
     }
 }
