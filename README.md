@@ -1,5 +1,5 @@
 
-TaskMana Pro
+TaskManaPro
 
 TaskMana Pro is a Trello-style task management application developed in C# using Windows Forms and SQL Server. 
 It allows users to create boards, lists, and tasks with features like drag-and-drop organization, task editing, 
@@ -28,7 +28,7 @@ Tech Stack
 Setup Instructions
 ------------------
 1. Clone the Repository
-   git clone https://github.username/TaskMana-Pro.git
+   git clone https://github.ofeyhalo/TaskManaPro.git
 
 2. Open the Solution
    - Open TaskManaPro.sln in Visual Studio 2022
