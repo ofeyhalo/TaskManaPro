@@ -63,7 +63,7 @@ namespace TaskManaPro.UserControls
             this.Cursor = System.Windows.Forms.Cursors.Hand; // Makes it look clickable
             this.Name = "TaskCard";
             this.Size = new System.Drawing.Size(220, 60); // Adjust size as needed
-            this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TaskCard_MouseDown);
+            //this.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TaskCard_MouseDown);
             this.MouseMove += new System.Windows.Forms.MouseEventHandler(this.TaskCard_MouseMove);
             this.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TaskCard_MouseUp);
             this.Click += new System.EventHandler(this.TaskCard_Click);

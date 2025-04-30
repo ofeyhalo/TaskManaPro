@@ -41,13 +41,13 @@ namespace TaskManaPro.UserControls
         }
 
         // Constructor when only TaskId is known
-        public TaskCard(int taskId)
-        {
-            InitializeComponent();
-            TaskId = taskId;
-            LoadTaskDetails();
-            InitializeDragEvents();
-        }
+        //public TaskCard(int taskId)
+        //{
+        //    InitializeComponent();
+        //    TaskId = taskId;
+        //    LoadTaskDetails();
+        //    InitializeDragEvents();
+        //}
 
         private void LoadTaskDetails()
         {
@@ -118,21 +118,21 @@ namespace TaskManaPro.UserControls
 
         private void InitializeDragEvents()
         {
-            this.MouseDown += TaskCard_MouseDown;
+            //this.MouseDown += TaskCard_MouseDown;
             this.MouseMove += TaskCard_MouseMove;
             this.MouseUp += TaskCard_MouseUp;
             this.Click += TaskCard_Click;
         }
 
-        private void TaskCard_MouseDown(object sender, MouseEventArgs e)
-        {
-            if (e.Button == MouseButtons.Left)
-            {
-                isDragging = true;
-                mouseOffset = e.Location;
-                DoDragDrop(this, DragDropEffects.Move);
-            }
-        }
+        //private void TaskCard_MouseDown(object sender, MouseEventArgs e)
+        //{
+        //    if (e.Button == MouseButtons.Left)
+        //    {
+        //        isDragging = true;
+        //        mouseOffset = e.Location;
+        //        DoDragDrop(this, DragDropEffects.Move);
+        //    }
+        //}
 
         private void TaskCard_MouseMove(object sender, MouseEventArgs e)
         {
@@ -156,13 +156,17 @@ namespace TaskManaPro.UserControls
 
         private void TaskCard_Click(object sender, EventArgs e)
         {
-            var taskId = this.TaskId; // Assume TaskId is a property of TaskCard
-            var taskTitle = this.TaskTitle; // Assume TaskTitle is another property
-
-            // Open the EditTaskControl form, passing the task details
-            var editTaskForm = new EditTaskForm(taskId, taskTitle);
-            editTaskForm.Show();  // Show the form separately
+            try
+            {
+                var editTaskForm = new EditTaskForm(TaskId, TaskTitle);
+                editTaskForm.ShowDialog(); // or ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error opening Edit Task Form: " + ex.Message);
+            }
         }
+
 
 
         //private void picOptions_Click(object sender, EventArgs e)
