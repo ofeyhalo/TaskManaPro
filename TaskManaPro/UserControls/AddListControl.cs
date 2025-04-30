@@ -52,7 +52,7 @@ namespace TaskManaPro.UserControls
                     int maxSortOrder = (int)getMaxOrderCmd.ExecuteScalar();
 
                     var insertCmd = new SqlCommand(
-                        "INSERT INTO Lists (BoardId, listTitle, SortOrder) VALUES (@BoardId, @listTitle, @SortOrder)",
+                        "INSERT INTO Lists (BoardId, listTitle, SortOrder, CreatedAt) VALUES (@BoardId, @listTitle, @SortOrder, GETDATE())",
                         conn
                     );
                     insertCmd.Parameters.AddWithValue("@BoardId", boardId);

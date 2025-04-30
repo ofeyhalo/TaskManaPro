@@ -127,5 +127,11 @@ namespace TaskManaPro.UserControls
             }
         }
 
+        public string ToolTipText
+        {
+            set => new ToolTip().SetToolTip(this, value);
+        }
+
+
     }
 }

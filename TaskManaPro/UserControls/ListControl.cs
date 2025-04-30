@@ -26,22 +26,38 @@ namespace TaskManaPro.UserControls
         {
             flpTasks.Controls.Clear();
 
-            using (SqlConnection conn = DatabaseHelper.GetConnection())
+            try
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT * FROM Tasks WHERE ListId = @ListId ORDER BY CreatedAt", conn);
-                cmd.Parameters.AddWithValue("@ListId", ListId);
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                while (reader.Read())
+                using (SqlConnection conn = DatabaseHelper.GetConnection())
                 {
-                    int taskId = (int)reader["TaskId"];
-                    string taskTitle = reader["TaskTitle"].ToString();
-                    int listId = (int)reader["ListId"];
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand("SELECT * FROM Tasks WHERE ListId = @ListId ORDER BY CreatedAt", conn);
+                    cmd.Parameters.AddWithValue("@ListId", ListId);
+                    SqlDataReader reader = cmd.ExecuteReader();
 
-                    TaskCard taskCard = new TaskCard(taskId, taskTitle, listId); // You’ll create this next
-                    flpTasks.Controls.Add(taskCard);
+                    while (reader.Read())
+                    {
+                        int taskId = (int)reader["TaskId"];
+                        string taskTitle = reader["TaskTitle"].ToString();
+                        int listId = (int)reader["ListId"];
+                        DateTime createdAt = reader["CreatedAt"] != DBNull.Value
+                            ? (DateTime)reader["CreatedAt"]
+                            : DateTime.MinValue;
+
+                        // Assuming your TaskCard can optionally accept CreatedAt
+                        TaskCard taskCard = new TaskCard(taskId, taskTitle, listId);
+                        // Optional: Display createdAt in tooltip or elsewhere
+                        taskCard.ToolTipText = $"Created on {createdAt:g}";
+
+                        flpTasks.Controls.Add(taskCard);
+                    }
+
+                    reader.Close();
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading tasks: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
             AddAddTaskCard();
@@ -60,27 +76,34 @@ namespace TaskManaPro.UserControls
 
         private void AddTaskBtn_Click(object sender, EventArgs e)
         {
-            // You can replace this with a custom 'AddTaskCard' control if needed
             string taskTitle = Microsoft.VisualBasic.Interaction.InputBox("Enter task title:", "Add Task", "");
 
             if (!string.IsNullOrWhiteSpace(taskTitle))
             {
                 InsertTaskToDatabase(taskTitle);
-                LoadTasks(); // Refresh task list
+                LoadTasks();
             }
         }
 
         private void InsertTaskToDatabase(string taskTitle)
         {
-            using (SqlConnection conn = DatabaseHelper.GetConnection())
+            try
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("INSERT INTO Tasks (TaskTitle, ListId, CreatedAt) VALUES (@Title, @ListId, GETDATE())", conn);
-                cmd.Parameters.AddWithValue("@Title", taskTitle);
-                cmd.Parameters.AddWithValue("@ListId", ListId);
-                cmd.ExecuteNonQuery();
+                using (SqlConnection conn = DatabaseHelper.GetConnection())
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand("INSERT INTO Tasks (TaskTitle, ListId, CreatedAt) VALUES (@Title, @ListId, GETDATE())", conn);
+                    cmd.Parameters.AddWithValue("@Title", taskTitle);
+                    cmd.Parameters.AddWithValue("@ListId", ListId);
+                    cmd.ExecuteNonQuery();
+                }
+
+                NotificationHelper.Show("New task added!");
             }
-            NotificationHelper.Show("New task added!");
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error inserting task: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
