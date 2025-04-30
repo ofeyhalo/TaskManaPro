@@ -75,7 +75,8 @@ namespace TaskManaPro.Forms
                 }
             }
 
-            sidePanel.Controls.Add(btnCreateBoard); // 👈 Add this LAST
+            // ✅ Ensure CreateBoard button is always shown
+            sidePanel.Controls.Add(btnCreateBoard);
         }
 
 
