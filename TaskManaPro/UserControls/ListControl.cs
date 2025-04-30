@@ -18,20 +18,21 @@ namespace TaskManaPro.UserControls
         public ListControl(int listId)
         {
             InitializeComponent();
-            this.ListId = listId;
+            ListId = listId;
             LoadTasks();
         }
 
         public void LoadTasks()
         {
-            flpTasks.Controls.Clear();
+            flpTasks.Controls.Clear(); // Clear existing controls
 
             try
             {
                 using (SqlConnection conn = DatabaseHelper.GetConnection())
                 {
                     conn.Open();
-                    SqlCommand cmd = new SqlCommand("SELECT * FROM Tasks WHERE ListId = @ListId ORDER BY CreatedAt", conn);
+                    SqlCommand cmd = new SqlCommand(
+                        "SELECT TaskId, TaskTitle, ListId, CreatedAt FROM Tasks WHERE ListId = @ListId ORDER BY CreatedAt", conn);
                     cmd.Parameters.AddWithValue("@ListId", ListId);
                     SqlDataReader reader = cmd.ExecuteReader();
 
@@ -44,11 +45,8 @@ namespace TaskManaPro.UserControls
                             ? (DateTime)reader["CreatedAt"]
                             : DateTime.MinValue;
 
-                        // Assuming your TaskCard can optionally accept CreatedAt
                         TaskCard taskCard = new TaskCard(taskId, taskTitle, listId);
-                        // Optional: Display createdAt in tooltip or elsewhere
-                        taskCard.ToolTipText = $"Created on {createdAt:g}";
-
+                        taskCard.ToolTipText = $"Created: {createdAt:ddd, MMM d yyyy h:mm tt}";
                         flpTasks.Controls.Add(taskCard);
                     }
 
@@ -60,28 +58,39 @@ namespace TaskManaPro.UserControls
                 MessageBox.Show($"Error loading tasks: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
 
-            AddAddTaskCard();
+            //AddAddTaskButton(); // Ensure this is only added once
         }
 
-        private void AddAddTaskCard()
-        {
-            Button addTaskBtn = new Button();
-            addTaskBtn.Text = "+ Add Task";
-            addTaskBtn.Dock = DockStyle.Top;
-            addTaskBtn.Height = 30;
-            addTaskBtn.Click += AddTaskBtn_Click;
+        //private void AddAddTaskButton()
+        //{
+        //    // Avoid adding multiple Add buttons
+        //    foreach (Control ctrl in flpTasks.Controls)
+        //    {
+        //        if (ctrl is Button btn && btn.Text == "+ Add Task")
+        //            return;
+        //    }
 
-            flpTasks.Controls.Add(addTaskBtn);
-        }
+        //    Button addTaskBtn = new Button
+        //    {
+        //        Text = "+ Add Task",
+        //        Dock = DockStyle.Top,
+        //        Height = 30
+        //    };
+
+        //    addTaskBtn.Click += AddTaskBtn_Click;
+        //    flpTasks.Controls.Add(addTaskBtn);
+        //}
 
         private void AddTaskBtn_Click(object sender, EventArgs e)
         {
-            string taskTitle = Microsoft.VisualBasic.Interaction.InputBox("Enter task title:", "Add Task", "");
+            // Use a custom input form if preferred; fallback to input box
+            string taskTitle = Microsoft.VisualBasic.Interaction.InputBox(
+                "Enter task title:", "Add Task", "");
 
             if (!string.IsNullOrWhiteSpace(taskTitle))
             {
                 InsertTaskToDatabase(taskTitle);
-                LoadTasks();
+                LoadTasks(); // Reload list with new task
             }
         }
 
@@ -92,7 +101,8 @@ namespace TaskManaPro.UserControls
                 using (SqlConnection conn = DatabaseHelper.GetConnection())
                 {
                     conn.Open();
-                    SqlCommand cmd = new SqlCommand("INSERT INTO Tasks (TaskTitle, ListId, CreatedAt) VALUES (@Title, @ListId, GETDATE())", conn);
+                    SqlCommand cmd = new SqlCommand(
+                        "INSERT INTO Tasks (TaskTitle, ListId, CreatedAt) VALUES (@Title, @ListId, GETDATE())", conn);
                     cmd.Parameters.AddWithValue("@Title", taskTitle);
                     cmd.Parameters.AddWithValue("@ListId", ListId);
                     cmd.ExecuteNonQuery();

@@ -4,92 +4,133 @@ using System.Drawing;
 using System.Windows.Forms;
 using TaskManaPro.Forms;
 using TaskManaPro.Helpers;
-using System.Data;
-
 
 namespace TaskManaPro.UserControls
 {
     public partial class TaskCard : UserControl
     {
-        public int TaskId { get; set; }
-        public int ListId { get; set; }
+        public int TaskId { get; private set; }
+        public int ListId { get; private set; }
 
+        private ToolTip toolTip;
         private Point mouseOffset;
         private bool isDragging;
 
         public string TaskTitle
         {
-            get { return lblTaskTitle.Text; }
-            set { lblTaskTitle.Text = value; }
+            get => lblTaskTitle.Text;
+            set => lblTaskTitle.Text = value;
         }
 
         public string TaskDescription
         {
-            get { return lblTaskDescription.Text; }
-            set { lblTaskDescription.Text = value; }
+            get => lblTaskDescription.Text;
+            set => lblTaskDescription.Text = value;
         }
 
-        // New constructor with TaskId and TaskTitle
+        // Constructor when all data is available
         public TaskCard(int taskId, string taskTitle, int listId)
         {
             InitializeComponent();
             TaskId = taskId;
-            TaskTitle = taskTitle;
             ListId = listId;
-            LoadTaskDetails();
+            TaskTitle = taskTitle;
 
-            // Enable mouse dragging
-            this.MouseDown += TaskCard_MouseDown;
+            LoadTaskDescription(); // Load only the description (title already set)
+            InitializeDragEvents();
         }
 
+        // Constructor when only TaskId is known
         public TaskCard(int taskId)
         {
             InitializeComponent();
             TaskId = taskId;
             LoadTaskDetails();
+            InitializeDragEvents();
         }
 
         private void LoadTaskDetails()
         {
-            using (SqlConnection conn = DatabaseHelper.GetConnection())
+            try
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("SELECT TaskTitle, TaskDescription, ListId FROM Tasks WHERE TaskId = @TaskId", conn);
-                cmd.Parameters.AddWithValue("@TaskId", TaskId);
-                SqlDataReader reader = cmd.ExecuteReader();
-
-                if (reader.Read())
+                using (SqlConnection conn = DatabaseHelper.GetConnection())
                 {
-                    TaskTitle = reader["TaskTitle"].ToString();
-                    TaskDescription = reader["TaskDescription"].ToString();
-                    ListId = (int)reader["ListId"];
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand("SELECT TaskTitle, TaskDescription, ListId FROM Tasks WHERE TaskId = @TaskId", conn);
+                    cmd.Parameters.AddWithValue("@TaskId", TaskId);
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        TaskTitle = reader["TaskTitle"].ToString();
+                        TaskDescription = reader["TaskDescription"].ToString();
+                        ListId = (int)reader["ListId"];
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to load task details: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void LoadTaskDescription()
+        {
+            try
+            {
+                using (SqlConnection conn = DatabaseHelper.GetConnection())
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand("SELECT TaskDescription FROM Tasks WHERE TaskId = @TaskId", conn);
+                    cmd.Parameters.AddWithValue("@TaskId", TaskId);
+                    SqlDataReader reader = cmd.ExecuteReader();
+
+                    if (reader.Read())
+                    {
+                        TaskDescription = reader["TaskDescription"].ToString();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to load task description: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void UpdateTaskList(int newListId)
         {
-            using (SqlConnection conn = DatabaseHelper.GetConnection())
+            try
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("UPDATE Tasks SET ListId = @NewListId WHERE TaskId = @TaskId", conn);
-                cmd.Parameters.AddWithValue("@NewListId", newListId);
-                cmd.Parameters.AddWithValue("@TaskId", TaskId);
-                cmd.ExecuteNonQuery();
+                using (SqlConnection conn = DatabaseHelper.GetConnection())
+                {
+                    conn.Open();
+                    SqlCommand cmd = new SqlCommand("UPDATE Tasks SET ListId = @NewListId WHERE TaskId = @TaskId", conn);
+                    cmd.Parameters.AddWithValue("@NewListId", newListId);
+                    cmd.Parameters.AddWithValue("@TaskId", TaskId);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to update task list: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-        private void TaskCard_Click(object sender, EventArgs e)
+        private void InitializeDragEvents()
         {
-            MessageBox.Show($"Task ID: {TaskId}\nTitle: {TaskTitle}\nDescription: {TaskDescription}");
+            this.MouseDown += TaskCard_MouseDown;
+            this.MouseMove += TaskCard_MouseMove;
+            this.MouseUp += TaskCard_MouseUp;
+            this.Click += TaskCard_Click;
         }
 
         private void TaskCard_MouseDown(object sender, MouseEventArgs e)
         {
-            // Start dragging the task card when the left mouse button is pressed
             if (e.Button == MouseButtons.Left)
             {
-                DoDragDrop(this, DragDropEffects.Move); // Initiate the drag operation
+                isDragging = true;
+                mouseOffset = e.Location;
+                DoDragDrop(this, DragDropEffects.Move);
             }
         }
 
@@ -106,32 +147,38 @@ namespace TaskManaPro.UserControls
         {
             isDragging = false;
 
-            ListControl newParent = this.Parent as ListControl;
-            if (newParent != null && newParent.ListId != ListId)
+            if (this.Parent is ListControl newParent && newParent.ListId != ListId)
             {
                 UpdateTaskList(newParent.ListId);
                 ListId = newParent.ListId;
             }
         }
 
+        private void TaskCard_Click(object sender, EventArgs e)
+        {
+            MessageBox.Show($"Task ID: {TaskId}\nTitle: {TaskTitle}\nDescription: {TaskDescription}", "Task Details");
+        }
+
         private void picOptions_Click(object sender, EventArgs e)
         {
-            var editControl = new EditTaskControl(this.TaskId); // Pass task ID
+            var editControl = new EditTaskControl(this.TaskId);
             editControl.Dock = DockStyle.Fill;
 
-            // Show on top of the parent form or mainContentPanel
             Form mainForm = this.FindForm();
             if (mainForm is MainForm mf)
             {
-                mf.ShowEditControl(editControl); // You'll create this method next
+                mf.ShowEditControl(editControl);
             }
         }
 
         public string ToolTipText
         {
-            set => new ToolTip().SetToolTip(this, value);
+            set
+            {
+                if (toolTip == null)
+                    toolTip = new ToolTip();
+                toolTip.SetToolTip(this, value);
+            }
         }
-
-
     }
 }
