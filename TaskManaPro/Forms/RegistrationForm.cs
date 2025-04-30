@@ -75,6 +75,7 @@ namespace TaskManaPro.Forms
 
                     MessageBox.Show("Registration successful!", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     this.Close();
+                    LoginForm.show();
                 }
             }
             catch (Exception ex)
