@@ -83,6 +83,7 @@ namespace TaskManaPro.UserControls
 
         private void AddTaskBtn_Click(object sender, EventArgs e)
         {
+            
             // Use a custom input form if preferred; fallback to input box
             string taskTitle = Microsoft.VisualBasic.Interaction.InputBox(
                 "Enter task title:", "Add Task", "");

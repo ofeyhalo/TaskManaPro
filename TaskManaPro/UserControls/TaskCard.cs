@@ -156,20 +156,26 @@ namespace TaskManaPro.UserControls
 
         private void TaskCard_Click(object sender, EventArgs e)
         {
-            MessageBox.Show($"Task ID: {TaskId}\nTitle: {TaskTitle}\nDescription: {TaskDescription}", "Task Details");
+            var taskId = this.TaskId; // Assume TaskId is a property of TaskCard
+            var taskTitle = this.TaskTitle; // Assume TaskTitle is another property
+
+            // Open the EditTaskControl form, passing the task details
+            var editTaskForm = new EditTaskForm(taskId, taskTitle);
+            editTaskForm.Show();  // Show the form separately
         }
 
-        private void picOptions_Click(object sender, EventArgs e)
-        {
-            var editControl = new EditTaskControl(this.TaskId);
-            editControl.Dock = DockStyle.Fill;
 
-            Form mainForm = this.FindForm();
-            if (mainForm is MainForm mf)
-            {
-                mf.ShowEditControl(editControl);
-            }
-        }
+        //private void picOptions_Click(object sender, EventArgs e)
+        //{
+        //    var editControl = new EditTaskForm(this.TaskId);
+        //    editControl.Dock = DockStyle.Fill;
+
+        //    Form mainForm = this.FindForm();
+        //    if (mainForm is MainForm mf)
+        //    {
+        //        mf.ShowEditControl(editControl);
+        //    }
+        //}
 
         public string ToolTipText
         {
